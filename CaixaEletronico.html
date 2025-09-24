@@ -1,53 +1,76 @@
 <html>
-
 <head>
-
 	<script>
-		var nome = prompt("Qual é o seu nome?")
-		var depositos = [];
-		alert(`Olá ${nome}, é um prazer ter você por aqui!`)
-		var saldo = 100.5; //Float
-		function inicio() {
+		var nome = prompt("Qual é o seu nome?");
+		var movimentacoes = []; 
+		alert(`Olá ${nome}, é um prazer ter você por aqui!`);
+		var saldo = 100.5; 
+		var senha = 3589;
+		var tentativas = 3;
 
-			var escolha = parseInt(prompt('Selecione uma opção 1.) Saldo 2.) Depósito 3.) Saque 4.) Extrato 5.) Sair'));
+		while (tentativas > 0) {
+			var senha_usuario = parseInt(prompt('Por favor, insira sua senha:'));
+			if (senha_usuario === senha) {
+				inicio();
+				break;
+			} else {
+				tentativas--;
+				if (tentativas > 0) {
+					alert('Senha incorreta. Você tem ' + tentativas + ' tentativas restantes.');
+				} else {
+					alert('Conta bloqueada. Tente novamente mais tarde.');
+				}
+			}
+		}
+
+		function inicio() {
+			var escolha = parseInt(prompt(
+				nome + ', selecione uma opção\n\n' +
+				'1.) Saldo \n2.) Extrato \n3.) Saque \n4.) Depósito \n5.) Transferência \n6.) Sair'
+			));
 
 			switch (escolha) {
 				case 1:
 					ver_saldo();
 					break;
 				case 2:
-					fazer_deposito();
+					extrato();
 					break;
 				case 3:
 					fazer_saque();
 					break;
 				case 4:
-					extrato();
+					fazer_deposito();
 					break;
 				case 5:
+					transferencia();
+					break;
+				case 6:
 					sair();
 					break;
 				default:
-					erro()
+					erro();
 					break;
 			}
-
 		}
 
 		function ver_saldo() {
-			alert('Seu saldo atual é: ' + saldo);
+			alert('Seu saldo atual é: R$ ' + saldo.toFixed(2));
 			inicio();
 		}
 
 		function fazer_deposito() {
 			var deposito = parseFloat(prompt('Qual o valor para depósito?'));
-			// Not a Number
-			if (isNaN(deposito) || deposito === '') {
-				alert('Por favor, informe um número:');
+
+			if (isNaN(deposito)) {
+				alert('Por favor, informe um número.');
 				fazer_deposito();
+			} else if (deposito <= 0) {
+				alert("Operação não autorizada.");
+				inicio();
 			} else {
 				saldo += deposito;
-				depositos.push(deposito);
+				movimentacoes.push({ tipo: "Depósito", valor: deposito });
 				ver_saldo();
 			}
 		}
@@ -55,47 +78,67 @@
 		function fazer_saque() {
 			var saque = parseFloat(prompt('Qual o valor para saque?'));
 
-			if (isNaN(saque) || saque === '') {
-				alert('Por favor, informe um número:');
+			if (isNaN(saque)) {
+				alert('Por favor, informe um número.');
 				fazer_saque();
-			}
-			else if (saque > saldo || saque <= 0) {
+			} else if (saque > saldo || saque <= 0) {
 				alert("Operação não autorizada.");
 				inicio();
-			}
-			else {
+			} else {
 				saldo -= saque;
-
+				movimentacoes.push({ tipo: "Saque", valor: saque });
 				ver_saldo();
 			}
 		}
 
 		function extrato() {
-			alert(`Frutas `);
+			if (movimentacoes.length === 0) {
+				alert('Nenhuma movimentação registrada!');
+				inicio();
+				return;
+			} else {
+				var mensagem = 'Extrato:\n';
+				for (var i = 0; i < movimentacoes.length; i++) {
+					mensagem += (i + 1) + ' - ' + movimentacoes[i].tipo + ': R$ ' + movimentacoes[i].valor.toFixed(2) + '\n';
+				}
+				alert(mensagem);
+			}
+			inicio();
+		}
+
+		function transferencia() {
+			var valor = parseFloat(prompt('Qual o valor para transferência?'));
+			var conta = prompt('Qual o número da conta?');
+
+			if (isNaN(valor)) {
+				alert('Por favor, informe um número.');
+				transferencia();
+			} else if (valor > saldo || valor <= 0) {
+				alert("Operação não autorizada.");
+				inicio();
+			} else {
+				saldo -= valor;
+				movimentacoes.push({ tipo: `Transferência para conta ${conta}`, valor: valor });
+				alert(`Você transferiu R$ ${valor.toFixed(2)} para a conta ${conta}.`);
+				ver_saldo();
+			}
 		}
 
 		function erro() {
-			alert('Por favor, informe um número entre 1 e 4');
+			alert('Opção inválida, por favor selecione uma opção válida.');
 			inicio();
 		}
 
 		function sair() {
 			var confirma = confirm('Você deseja sair?');
 			if (confirma) {
-				window.close();
+				alert(`${nome}, foi um prazer ter você por aqui!`);
 			} else {
 				inicio();
 			}
 		}
-
-
-
-		inicio();
 	</script>
 </head>
-
 <body>
-
 </body>
-
 </html>
